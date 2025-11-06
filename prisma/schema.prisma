@@ -15,7 +15,34 @@ datasource db {
 }
 
 model User {
-  userId       Int     @id @default(autoincrement())
-  username String  @unique
-  password String
+  userId          Int          @id @default(autoincrement())
+  username        String       @unique
+  password        String
+  level           Int          @default(1)
+  currentXP       Int          @default(0)
+  nextLevelXP     Int          @default(100)
+  completedQuests Int          @default(0)
+  streak          Int          @default(0)
+  userQuests      UserQuest[]
+}
+
+model Quest {
+  questId   Int          @id @default(autoincrement())
+  questName String
+  xp        Int
+  isActive  Boolean       @default(true)
+  userQuests UserQuest[]
+}
+
+model UserQuest {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  questId     Int
+  completed   Boolean  @default(false)
+  completedAt DateTime?
+  
+  user  User  @relation(fields: [userId], references: [userId])
+  quest Quest @relation(fields: [questId], references: [questId])
+
+  @@unique([userId, questId], name: "userId_questId")
 }

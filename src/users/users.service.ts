@@ -10,6 +10,20 @@ export type User = {
 export class UsersService {
   constructor(private prisma: PrismaService) {}
 
+  async getUserStats(userId: number) {
+    return this.prisma.user.findUnique({
+        where: { userId },
+        select: {
+            username: true,
+            level: true,
+            currentXP: true,
+            nextLevelXP: true,
+            completedQuests: true,
+            streak: true,
+        },
+    });
+  }
+
   async findUserByName(username: string): Promise<User | null> {
     return this.prisma.user.findUnique({
       where: { username },
