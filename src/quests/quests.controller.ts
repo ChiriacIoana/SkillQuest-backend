@@ -11,23 +11,18 @@ export class QuestsController {
   }
 
   @Post()
-  async createQuest(
-    @Body() body: { userId: number; questName: string; xp: number },
-  ) {
+  async createQuest(@Body() body: { userId: number; questName: string; xp: number }) {
     const { userId, questName, xp } = body;
     return this.questsService.createQuest(userId, questName, xp);
   }
 
   @Patch(':userId/:questId/complete')
-  async completeQuest(
-    @Param('userId') userId: string,
-    @Param('questId') questId: string,
-  ) {
+  async completeQuest(@Param('userId') userId: string, @Param('questId') questId: string) {
     return this.questsService.completeQuest(Number(userId), Number(questId));
   }
 
-  @Delete(':id')
-  async deleteQuest(@Param('id') id: string) {
-    return this.questsService.deleteQuest(Number(id));
+  @Delete(':questId')
+  async deleteQuest(@Param('questId') questId: string) {
+    return this.questsService.deleteQuest(Number(questId));
   }
 }

@@ -1,6 +1,7 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
+import { PrismaService } from '../../prisma/prisma.service';
 
 type AuthInput = {username: string; password: string;};
 type SignInData = {userId: number; username: string;};
@@ -11,6 +12,7 @@ export class AuthService {
     constructor(
         private userService: UsersService,
         private jwtService: JwtService,
+        private prisma: PrismaService,
     ) {}
 
     async authenticate(input: AuthInput): Promise<AuthResult> {
@@ -45,4 +47,12 @@ export class AuthService {
         const accessToken  = await this.jwtService.signAsync(tokenPayload);
         return {accessToken, username: user.username, userId: user.userId};
     }
+
+
+    async getUserById(userId: number) {
+    return this.prisma.user.findUnique({
+      where: { userId },
+    });
+}
+
 }
