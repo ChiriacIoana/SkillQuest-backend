@@ -10,7 +10,7 @@ import { PrismaModule } from 'prisma/prisma.module';
   imports: [PrismaModule],
   providers: [UsersService],
   controllers: [UsersController],
-  exports: [UsersModule],
+  exports: [UsersModule, UsersService],
 
 })
 export class UsersModule {}

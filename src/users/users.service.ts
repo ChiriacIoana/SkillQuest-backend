@@ -10,7 +10,7 @@ export type User = {
 export class UsersService {
   constructor(private prisma: PrismaService) {}
 
-  async findUserByName(username: string): Promise<User | undefined> {
+  async findUserByName(username: string): Promise<User | null> {
     return this.prisma.user.findUnique({
       where: { username },
     });
