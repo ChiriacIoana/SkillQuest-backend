@@ -5,13 +5,14 @@ import { QuestsService } from './quests.service';
 export class QuestsController {
   constructor(private readonly questsService: QuestsService) {}
 
-  @Get('category/:category/:questId')
-  async getQuestByCategoryAndId(
-    @Param('category') category: string,
-    @Param('questId') questId: string,
-  ) {
-    return this.questsService.getQuestByCategoryAndId(category, Number(questId));
-  }
+@Get('category/:category/:questId')
+async getQuestByCategoryAndId(
+  @Param('category') category: string,
+  @Param('questId') questId: string,
+) {
+  console.log('Hit getQuestByCategoryAndId', category, questId);
+  return this.questsService.getQuestByCategoryAndId(category, Number(questId));
+}
 
   @Get('details/:questId')
 async getQuestById(@Param('questId') questId: string) {
