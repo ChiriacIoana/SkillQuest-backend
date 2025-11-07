@@ -32,6 +32,7 @@ model Quest {
   description String?
   xp          Int
   category    String       @default("Calculus")
+  difficulty  String       @default("Intermediate")
   isActive    Boolean      @default(true)
   userQuests  UserQuest[]
 }

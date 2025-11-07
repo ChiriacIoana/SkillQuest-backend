@@ -8,10 +8,17 @@ export class QuestsController {
 @Get('category/:category/:questId')
 async getQuestByCategoryAndId(
   @Param('category') category: string,
-  @Param('questId') questId: string,
+  @Param('questId') questId: string
 ) {
   console.log('Hit getQuestByCategoryAndId', category, questId);
   return this.questsService.getQuestByCategoryAndId(category, Number(questId));
+}
+
+@Get('category/:category')
+async getQuestsByCategory(@Param('category') category: string) {
+  const data = await this.questsService.getQuestsByCategory(category);
+
+  return data;
 }
 
   @Get('details/:questId')

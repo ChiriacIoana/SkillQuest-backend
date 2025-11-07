@@ -90,9 +90,12 @@ export class QuestsService {
 
 async getQuestsByCategory(category: string) {
   const quests = await this.prisma.quest.findMany({
-    where: { isActive: true },
+    where: {
+      isActive: true,
+      category: category,
+    },
   });
-  return quests.filter((q) => (q as any).category === category);
+  return quests;
 }
 
 async getQuestByCategoryAndId(category: string, questId: number) {
