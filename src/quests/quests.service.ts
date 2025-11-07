@@ -5,6 +5,14 @@ import { Injectable } from '@nestjs/common';
 export class QuestsService {
   constructor(private prisma: PrismaService) {}
 
+
+  async getQuestById(questId: number) {
+  return this.prisma.quest.findUnique({
+    where: { questId },
+  });
+}
+
+
   async getCompletedQuests(userId: number) {
     return this.prisma.userQuest.findMany({
       where: { userId, completed: true },
@@ -28,19 +36,22 @@ export class QuestsService {
     });
   }
 
-  async createQuest(userId: number, questName: string, xp: number) {
-   
-    const quest = await this.prisma.quest.create({
-      data: { questName, xp },
-    });
+  async createQuest(userId: number, questName: string, xp: number, category: string) {
+  const quest = await this.prisma.quest.create({
+    data: { 
+      questName, 
+      xp,
+      description: null
+    },
+  });
 
-    return this.prisma.userQuest.create({
-      data: {
-        userId,
-        questId: quest.questId,
-      },
-    });
-  }
+  return this.prisma.userQuest.create({
+    data: {
+      userId,
+      questId: quest.questId,
+    },
+  });
+}
 
   async completeQuest(userId: number, questId: number) {
     const userQuest = await this.prisma.userQuest.upsert({
@@ -77,6 +88,23 @@ export class QuestsService {
     return userQuest;
   }
 
+async getQuestsByCategory(category: string) {
+  const quests = await this.prisma.quest.findMany({
+    where: { isActive: true },
+  });
+  return quests.filter((q) => (q as any).category === category);
+}
+
+async getQuestByCategoryAndId(category: string, questId: number) {
+  const quest = await this.prisma.quest.findUnique({
+    where: { questId },
+  });
+
+  if (!quest || !quest.isActive) return null;
+  if ((quest as any).category !== category) return null;
+
+  return quest;
+}
   async deleteQuest(id: number) {
     return this.prisma.userQuest.delete({
       where: { id },

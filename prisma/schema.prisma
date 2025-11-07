@@ -20,18 +20,20 @@ model User {
   password        String
   level           Int          @default(1)
   currentXP       Int          @default(0)
-  nextLevelXP     Int          @default(100)
+  nextLevelXP     Int          @default(500)
   completedQuests Int          @default(0)
   streak          Int          @default(0)
   userQuests      UserQuest[]
 }
 
 model Quest {
-  questId   Int          @id @default(autoincrement())
-  questName String
-  xp        Int
-  isActive  Boolean       @default(true)
-  userQuests UserQuest[]
+  questId     Int          @id @default(autoincrement())
+  questName   String
+  description String?
+  xp          Int
+  category    String       @default("Calculus")
+  isActive    Boolean      @default(true)
+  userQuests  UserQuest[]
 }
 
 model UserQuest {
