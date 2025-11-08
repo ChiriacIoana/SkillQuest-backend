@@ -32,9 +32,11 @@ model Quest {
   description String?
   xp          Int
   category    String       @default("Calculus")
+  questionIds  Int[]       @default([]) 
   difficulty  String       @default("Intermediate")
   isActive    Boolean      @default(true)
   userQuests  UserQuest[]
+
 }
 
 model UserQuest {
@@ -52,12 +54,12 @@ model UserQuest {
 
 model QuizQuestion {
   id           Int      @id @default(autoincrement())
-  externalId   String?  @unique // if external API provides stable ID
-  source       String   // "quizapi" etc
+  externalId   String?  @unique 
+  source       String   
   category     String
   difficulty   String?
   question     String   @db.Text
-  answersJson  String   // JSON string of answers/options
+  answersJson  String  
   correctIndex Int?
   xp           Int      @default(50)
   createdAt    DateTime @default(now())
