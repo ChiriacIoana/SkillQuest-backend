@@ -1,9 +1,13 @@
 import { PrismaService } from '../../prisma/prisma.service';
 import { Injectable } from '@nestjs/common';
+import { AchievementsService } from '../achievements/achievements.service';
 
 @Injectable()
 export class QuestsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private achievementsService: AchievementsService,
+) {}
 
 
   async getQuestById(questId: number) {
@@ -62,6 +66,7 @@ export class QuestsService {
 
     const quest = await this.prisma.quest.findUnique({ where: { questId } });
     const user = await this.prisma.user.findUnique({ where: { userId } });
+    const newAchievements = await this.achievementsService.checkAndUnlockAchievements(userId);
 
     if (quest && user) {
       let newXP = user.currentXP + quest.xp;
@@ -85,7 +90,10 @@ export class QuestsService {
       });
     }
 
-    return userQuest;
+    return {
+      userQuest,
+      newAchievements,
+    };
   }
 
 async getQuestsByCategory(category: string) {

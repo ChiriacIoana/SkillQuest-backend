@@ -11,8 +11,6 @@ import { QuestsService } from './quests.service';
 import {
   getQuestions,
   saveQuestions,
-  getCategories,
-  getTags,
 } from 'src/services/quizapi.service';
 import { PrismaService } from 'prisma/prisma.service';
 

@@ -23,6 +23,7 @@ model User {
   nextLevelXP     Int          @default(500)
   completedQuests Int          @default(0)
   streak          Int          @default(0)
+  achievements    UserAchievement[]
   userQuests      UserQuest[]
 }
 
@@ -65,3 +66,31 @@ model QuizQuestion {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 }
+
+model Achievement {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String
+  icon        String   // emoji or icon name
+  xpRequired  Int?     // for XP-based achievements
+  questsRequired Int?  // for quest-based achievements
+  category    String   // "xp", "quests", "streak", etc.
+  rarity      String   @default("common") // common, rare, epic, legendary
+  createdAt   DateTime @default(now())
+  
+  userAchievements UserAchievement[]
+}
+
+model UserAchievement {
+  id            Int      @id @default(autoincrement())
+  userId        Int
+  achievementId Int
+  unlockedAt    DateTime @default(now())
+  
+  user          User         @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  achievement   Achievement  @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, achievementId])
+  @@index([userId])
+}
+

@@ -9,6 +9,7 @@ import { ConfigModule } from '@nestjs/config';
 import { QuestsModule } from './quests/quests.module';
 import { BootstrapController } from './controllers/bootstrapController';
 import { QuizApiService } from './services/external.quizapi.service';
+import { AchievementsModule } from './achievements/achievements.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { QuizApiService } from './services/external.quizapi.service';
     AuthModule,
     PrismaModule,
     QuestsModule,
+    AchievementsModule,
   ],
   controllers: [
     AppController,
