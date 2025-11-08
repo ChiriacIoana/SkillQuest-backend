@@ -6,7 +6,6 @@ import {
   Body,
   Patch,
   Delete,
-  Query,
 } from '@nestjs/common';
 import { QuestsService } from './quests.service';
 import {
@@ -133,7 +132,7 @@ async debugQuest(@Param('questId') questId: string) {
     @Param('category') category: string,
     @Param('questId') questId: string,
   ) {
-    console.log('🔍 getQuestions called with:', { category, questId });
+    console.log('getQuestions called with:', { category, questId });
 
     const quest = await this.prisma.quest.findUnique({
       where: { questId: Number(questId) },
@@ -141,7 +140,7 @@ async debugQuest(@Param('questId') questId: string) {
     });
 
     if (!quest || !quest.questionIds || quest.questionIds.length === 0) {
-      console.log('⚠️ No questions assigned to quest', questId);
+      console.log('No questions assigned to quest', questId);
       return [];
     }
 
@@ -155,8 +154,22 @@ async debugQuest(@Param('questId') questId: string) {
 
     console.log('Found questions:', questions.length);
 
+     const processedQuestions = questions.map(q => {
+    if (q.answersJson) {
+      const answers = JSON.parse(q.answersJson);
+      const answerEntries = Object.entries(answers).slice(0, 4);
+      const limitedAnswers = Object.fromEntries(answerEntries);
+      
+      return {
+        ...q,
+        answersJson: JSON.stringify(limitedAnswers)
+      };
+    }
+    return q;
+  });
+
     const orderedQuestions = quest.questionIds
-      .map((id) => questions.find((q) => q.id === id))
+      .map((id) => processedQuestions.find((q) => q.id === id))
       .filter((q) => q !== undefined);
 
     return orderedQuestions;
