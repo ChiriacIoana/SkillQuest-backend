@@ -49,3 +49,17 @@ model UserQuest {
 
   @@unique([userId, questId], name: "userId_questId")
 }
+
+model QuizQuestion {
+  id           Int      @id @default(autoincrement())
+  externalId   String?  @unique // if external API provides stable ID
+  source       String   // "quizapi" etc
+  category     String
+  difficulty   String?
+  question     String   @db.Text
+  answersJson  String   // JSON string of answers/options
+  correctIndex Int?
+  xp           Int      @default(50)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}

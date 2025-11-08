@@ -7,6 +7,8 @@ import { PrismaModule } from '../prisma/prisma.module';
 import { User } from './users/users.entity';
 import { ConfigModule } from '@nestjs/config';
 import { QuestsModule } from './quests/quests.module';
+import { BootstrapController } from './controllers/bootstrapController';
+import { QuizApiService } from './services/external.quizapi.service';
 
 @Module({
   imports: [
@@ -16,7 +18,13 @@ import { QuestsModule } from './quests/quests.module';
     PrismaModule,
     QuestsModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [
+    AppController,
+    BootstrapController,
+  ],
+  providers: [
+    AppService,
+    QuizApiService,
+  ],
 })
 export class AppModule {}
