@@ -6,16 +6,16 @@ import envConfig from '../../../env.config';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor(private readonly cls: ClsService) {
-    super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      secretOrKey: envConfig.JWT_SECRET
-    });
-  }
+	constructor(private readonly cls: ClsService) {
+		super({
+			jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+			secretOrKey: envConfig.JWT_SECRET
+		});
+	}
 
-  async validate(payload: any) {
-    this.cls.set('userID', payload.userID);
+	async validate(payload: any) {
+		this.cls.set('userID', payload.userId);
 
-    return true;
-  }
+		return true;
+	}
 }

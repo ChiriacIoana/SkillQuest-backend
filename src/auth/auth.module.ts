@@ -6,8 +6,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport/dist/passport.module';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { LocalStrategy } from './strategies/local.strategy';
-
-const JWT_SECRET = process.env.JWT_SECRET ?? 'default_jwt';
+import envConfig from '../../env.config';
 
 @Module({
 	providers: [AuthService, JwtStrategy, LocalStrategy],
@@ -16,7 +15,7 @@ const JWT_SECRET = process.env.JWT_SECRET ?? 'default_jwt';
 		UsersModule,
 		JwtModule.register({
 			global: true,
-			secret: JWT_SECRET
+			secret: envConfig.JWT_SECRET
 		}),
 		PassportModule
 	],

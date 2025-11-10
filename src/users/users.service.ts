@@ -3,7 +3,7 @@ import { CommonService } from 'src/common/services/common.service';
 
 @Injectable()
 export class UsersService extends CommonService {
-	async getUserStats(userId: number) {
+	async getUserStats(userId: number = this.userID) {
 		return this.prisma.user.findUnique({
 			where: { userId },
 			select: {
@@ -31,9 +31,5 @@ export class UsersService extends CommonService {
 
 	async getAllUsers() {
 		return this.prisma.user.findMany();
-	}
-
-	async newServ() {
-		this.userID;
 	}
 }

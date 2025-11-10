@@ -7,6 +7,8 @@ import { BootstrapController } from './controllers/bootstrapController';
 import { QuizApiService } from './services/external.quizapi.service';
 import { AchievementsModule } from './achievements/achievements.module';
 import { LocalStorageModule } from './config/local-storage-module';
+import { APP_GUARD } from '@nestjs/core/constants';
+import { AuthenticatedGuard } from './auth/guards/authenticated.guard';
 
 @Module({
 	imports: [
@@ -18,6 +20,12 @@ import { LocalStorageModule } from './config/local-storage-module';
 		AchievementsModule
 	],
 	controllers: [BootstrapController],
-	providers: [QuizApiService]
+	providers: [
+		QuizApiService,
+		{
+			provide: APP_GUARD,
+			useClass: AuthenticatedGuard
+		}
+	]
 })
 export class AppModule {}

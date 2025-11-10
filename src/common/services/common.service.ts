@@ -7,7 +7,7 @@ export interface CustomClsStore extends ClsStore {
 }
 
 export abstract class CommonService {
-	@Inject('DB')
+	@Inject(PrismaService)
 	protected readonly prisma: PrismaService;
 
 	@Inject()

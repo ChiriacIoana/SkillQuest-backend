@@ -1,50 +1,60 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { User, UsersService } from 'src/users/users.service';
+import {
+	Injectable,
+	InternalServerErrorException,
+	UnauthorizedException
+} from '@nestjs/common';
+import { UsersService } from 'src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../../prisma/prisma.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { BcryptUtils } from 'src/common/utils/bcrypt.utils';
-
+import { CommonService } from 'src/common/services/common.service';
 
 @Injectable()
-export class AuthService {
-    constructor(
-        private userService: UsersService,
-        private jwtService: JwtService,
-        private prisma: PrismaService,
-    ) {}
+export class AuthService extends CommonService {
+	constructor(
+		private userService: UsersService,
+		private jwtService: JwtService
+	) {
+		super();
+	}
 
-    async validateUser(loginDto: LoginDto) {
-        const user = await this.userService.findUserByName(loginDto.username);
+	async validateUser(loginDto: LoginDto) {
+		const user = await this.userService.findUserByName(loginDto.username);
 
-         if(!user || !await BcryptUtils.comparePasswords(loginDto.password, user.password)) {
-            throw new UnauthorizedException();
-        }
+		if (
+			!user ||
+			!(await BcryptUtils.comparePasswords(loginDto.password, user.password))
+		) {
+			throw new UnauthorizedException();
+		}
 
-        const tokenPayload = {
-            sub: user.userId,
-            username: user.username,
-        };
+		const tokenPayload = {
+			userId: user.userId,
+			username: user.username
+		};
 
-        const accessToken  = await this.jwtService.signAsync(tokenPayload);
-        return {accessToken, username: user.username, userId: user.userId};
-
-    }
-      async register(registerDto: RegisterDto): Promise<User> {
-        return this.prisma.user.create({
-          data: {
-            username: registerDto.username,
-            password: await BcryptUtils.hashPassword(registerDto.password),
-          }
-        });
-      }
-
-
-    async getUserById(userId: number) {
-    return this.prisma.user.findUnique({
-      where: { userId },
-    });
-}
-
+		const accessToken = await this.jwtService.signAsync(tokenPayload);
+		return { accessToken, userId: user.userId };
+	}
+	async register(registerDto: RegisterDto) {
+		try {
+			await this.prisma.user.create({
+				data: {
+					username: registerDto.username,
+					password: await BcryptUtils.hashPassword(registerDto.password)
+				},
+				select: {
+					userId: true
+				}
+			});
+		} catch (err) {
+			if (err.code === 'P2002') {
+				throw new UnauthorizedException('Username already exists');
+			} else {
+				throw new InternalServerErrorException();
+			}
+		}
+	}
 }
