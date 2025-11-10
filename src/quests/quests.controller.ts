@@ -11,6 +11,8 @@ import { QuestsService } from './quests.service';
 import {
   getQuestions,
   saveQuestions,
+
+
 } from 'src/services/quizapi.service';
 import { PrismaService } from 'prisma/prisma.service';
 
@@ -80,7 +82,7 @@ async getHtmlQuestionIds() {
     select: { id: true, question: true },
     orderBy: { id: 'asc' },
   });
-  
+
   return {
     count: questions.length,
     ids: questions.map(q => q.id),
@@ -94,15 +96,15 @@ async debugQuest(@Param('questId') questId: string) {
   const quest = await this.prisma.quest.findUnique({
     where: { questId: Number(questId) },
   });
-  
+
   if (!quest) return { error: 'Quest not found' };
-  
+
   const questions = await this.prisma.quizQuestion.findMany({
     where: { 
       id: { in: quest.questionIds || [] },
     },
   });
-  
+
   return {
     quest,
     questionIdsInQuest: quest.questionIds,
@@ -157,7 +159,7 @@ async debugQuest(@Param('questId') questId: string) {
       const answers = JSON.parse(q.answersJson);
       const answerEntries = Object.entries(answers).slice(0, 4);
       const limitedAnswers = Object.fromEntries(answerEntries);
-      
+
       return {
         ...q,
         answersJson: JSON.stringify(limitedAnswers)

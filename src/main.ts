@@ -12,6 +12,7 @@ async function bootstrap() {
 
   const configService = app.get(ConfigService);
   const port = configService.get<number>('PORT') || 5500;
+  const host = configService.get<string>('HOST') || 'localhost';
 
   await app.listen(port);
   console.log(`✅ Server running on http://localhost:${port}`);

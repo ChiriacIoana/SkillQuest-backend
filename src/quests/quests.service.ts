@@ -121,4 +121,4 @@ async getQuestByCategoryAndId(category: string, questId: number) {
       where: { id },
     });
   }
-}
+  }
