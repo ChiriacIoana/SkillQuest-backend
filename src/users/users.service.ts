@@ -1,48 +1,39 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../../prisma/prisma.service';
-export type User = {
-  userId: number;
-  username: string;
-  password: string;
-};
+import { CommonService } from 'src/common/services/common.service';
 
 @Injectable()
-export class UsersService {
-  constructor(private prisma: PrismaService) {}
+export class UsersService extends CommonService {
+	async getUserStats(userId: number) {
+		return this.prisma.user.findUnique({
+			where: { userId },
+			select: {
+				username: true,
+				level: true,
+				currentXP: true,
+				nextLevelXP: true,
+				completedQuests: true,
+				streak: true
+			}
+		});
+	}
 
-  async getUserStats(userId: number) {
-    return this.prisma.user.findUnique({
-        where: { userId },
-        select: {
-            username: true,
-            level: true,
-            currentXP: true,
-            nextLevelXP: true,
-            completedQuests: true,
-            streak: true,
-        },
-    });
-  }
+	async findUserByName(username: string) {
+		return this.prisma.user.findUnique({
+			where: { username }
+		});
+	}
 
-  async findUserByName(username: string): Promise<User | null> {
-    return this.prisma.user.findUnique({
-      where: { username },
-    });
-  }
+	async getUserById(userId: number) {
+		return this.prisma.user.findUnique({
+			where: { userId }
+		});
+	}
 
-  async getUserById(userId: number) {
-    return this.prisma.user.findUnique({
-      where: { userId },
-    });
-  }
+	async getAllUsers() {
+		return this.prisma.user.findMany();
+	}
 
-  async createUser(username: string, password: string): Promise<User> {
-    return this.prisma.user.create({
-      data: { username, password },
-    });
-  }
-
-  async getAllUsers(): Promise<User[]> {
-    return this.prisma.user.findMany();
-  }
+	async newServ() {
+		this.userID;
+	}
 }

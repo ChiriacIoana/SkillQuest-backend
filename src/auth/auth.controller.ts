@@ -1,24 +1,35 @@
-import { Controller, HttpStatus, HttpCode, NotImplementedException, Post, Body, Get, UseGuards, Request } from '@nestjs/common';
+import {
+  Controller,
+  HttpStatus,
+  HttpCode,
+  NotImplementedException,
+  Post,
+  Body,
+  Get,
+  UseGuards,
+  Request,
+  Req,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { AuthGuard } from './guards/auth.guards';
+import { LoginDto } from './dto/login.dto';
+import { RegisterDto } from './dto/register.dto';
+import { LocalAuthGuard } from './guards/local.guard';
+import { Public } from 'src/common/decorators/public.decorator';
 
 @Controller('auth')
 export class AuthController {
-    constructor(private authService: AuthService) {
-        
-    }
+  constructor(private authService: AuthService) {}
 
-    @HttpCode(HttpStatus.OK)
-    @Post('login')
-    login(@Body() input: {username: string; password: string;}) {
-        return this.authService.authenticate(input);
-    }
+  @Public()
+  @Post('login')
+  @UseGuards(LocalAuthGuard)
+  async login(@Body() loginDto: LoginDto, @Req() req: Request & { user: any }) {
+    return req.user;
+  }
 
-    @UseGuards(AuthGuard)
-    @Get('me')
-    getUserInfo(@Request() request) {
-        return request.user;
-    }
+  @Public()
+  @Post('register')
+  async register(@Body() registerDto: RegisterDto) {
+    return this.authService.register(registerDto);
+  }
 }
-
-

@@ -1,11 +1,11 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { UsersService } from 'src/users/users.service';
+import { User, UsersService } from 'src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../../prisma/prisma.service';
+import { RegisterDto } from './dto/register.dto';
+import { LoginDto } from './dto/login.dto';
+import { BcryptUtils } from 'src/common/utils/bcrypt.utils';
 
-type AuthInput = {username: string; password: string;};
-type SignInData = {userId: number; username: string;};
-type AuthResult = {accessToken: string; userId: number; username: string;};
 
 @Injectable()
 export class AuthService {
@@ -15,30 +15,13 @@ export class AuthService {
         private prisma: PrismaService,
     ) {}
 
-    async authenticate(input: AuthInput): Promise<AuthResult> {
-        const user = await this.validateUser(input);
+    async validateUser(loginDto: LoginDto) {
+        const user = await this.userService.findUserByName(loginDto.username);
 
-        if(!user) {
+         if(!user || !await BcryptUtils.comparePasswords(loginDto.password, user.password)) {
             throw new UnauthorizedException();
-
         }
 
-        return this.signIn(user);
-    }
-
-    async validateUser(input: AuthInput): Promise<SignInData | null> {
-        const user = await this.userService.findUserByName(input.username);
-
-        if(user && user.password === input.password) {
-            return {
-                userId: user.userId,
-                username: user.username,
-            };
-        }
-        return null;
-    }
-
-    async signIn(user: SignInData): Promise<AuthResult> {
         const tokenPayload = {
             sub: user.userId,
             username: user.username,
@@ -46,7 +29,16 @@ export class AuthService {
 
         const accessToken  = await this.jwtService.signAsync(tokenPayload);
         return {accessToken, username: user.username, userId: user.userId};
+
     }
+      async register(registerDto: RegisterDto): Promise<User> {
+        return this.prisma.user.create({
+          data: {
+            username: registerDto.username,
+            password: await BcryptUtils.hashPassword(registerDto.password),
+          }
+        });
+      }
 
 
     async getUserById(userId: number) {
