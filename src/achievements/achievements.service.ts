@@ -4,8 +4,8 @@ import { CommonService } from '../common/services/common.service';
 @Injectable()
 export class AchievementsService extends CommonService {
 	async checkAndUnlockAchievements(userId: number): Promise<any[]> {
-		const user = await this.prisma.user.findFirst({
-			where: { id: userId } as any,
+		const user = await this.prisma.user.findUnique({
+			where: { userId },
 			include: {
 				userQuests: { where: { completed: true } },
 				achievements: { include: { achievement: true } }
@@ -14,16 +14,11 @@ export class AchievementsService extends CommonService {
 
 		if (!user) return [];
 
-		const completedQuestsCount =
-			typeof (user as any).completedQuests === 'number'
-				? (user as any).completedQuests
-				: Array.isArray((user as any).userQuests)
-					? (user as any).userQuests.length
-					: 0;
-		const totalXP = (user as any).xp ?? (user as any).currentXP ?? 0;
-		const unlockedAchievementIds = Array.isArray((user as any).achievements)
-			? (user as any).achievements.map((a: any) => a.achievementId)
-			: [];
+		const completedQuestsCount = user.userQuests.length;
+		const totalXP = user.currentXP || 0;
+		const unlockedAchievementIds = user.achievements.map(
+			(a) => a.achievementId
+		);
 
 		const availableAchievements = await this.prisma.achievement.findMany({
 			where: {

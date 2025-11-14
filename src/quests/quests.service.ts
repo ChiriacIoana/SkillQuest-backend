@@ -1,4 +1,3 @@
-import { PrismaService } from '../../prisma/prisma.service';
 import { Injectable } from '@nestjs/common';
 import { AchievementsService } from '../achievements/achievements.service';
 import { CommonService } from 'src/common/services/common.service';
@@ -61,43 +60,33 @@ export class QuestsService extends CommonService {
 	}
 
 	async completeQuest(userId: number, questId: number) {
-		const userQuest = await this.prisma.userQuest.upsert({
-			where: { userId_questId: { userId, questId } },
-			update: { completed: true, completedAt: new Date() },
-			create: { userId, questId, completed: true, completedAt: new Date() }
-		});
+		try {
+			console.log('COMPLETE QUEST HIT', { userId, questId });
 
-		const quest = await this.prisma.quest.findUnique({ where: { questId } });
-		const user = await this.prisma.user.findUnique({ where: { userId } });
-		const newAchievements =
-			await this.achievementsService.checkAndUnlockAchievements(userId);
+			const quest = await this.prisma.quest.findUnique({ where: { questId } });
+			if (!quest) throw new Error(`Quest ${questId} not found`);
 
-		if (quest && user) {
-			let newXP = user.currentXP + quest.xp;
-			let newLevel = user.level;
-			let nextLevelXP = user.nextLevelXP;
+			const userQuest = await this.prisma.userQuest.upsert({
+				where: { userId_questId: { userId, questId } },
+				update: { completed: true, completedAt: new Date() },
+				create: { userId, questId, completed: true }
+			});
 
-			while (newXP >= nextLevelXP) {
-				newXP -= nextLevelXP;
-				newLevel++;
-				nextLevelXP = Math.floor(nextLevelXP * 1.2);
-			}
-
-			await this.prisma.user.update({
+			const updatedUser = await this.prisma.user.update({
 				where: { userId },
 				data: {
-					currentXP: newXP,
-					level: newLevel,
-					nextLevelXP,
+					currentXP: { increment: quest.xp ?? 0 },
 					completedQuests: { increment: 1 }
 				}
 			});
-		}
 
-		return {
-			userQuest,
-			newAchievements
-		};
+			console.log('AFTER UPDATE:', updatedUser);
+
+			return { success: true, updatedUser };
+		} catch (err) {
+			console.error('ERROR in completeQuest:', err);
+			throw err;
+		}
 	}
 
 	async getQuestsByCategory(category: string) {

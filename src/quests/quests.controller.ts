@@ -5,7 +5,8 @@ import {
 	Param,
 	Body,
 	Patch,
-	Delete
+	Delete,
+	ParseIntPipe
 } from '@nestjs/common';
 import { QuestsService } from './quests.service';
 import { getQuestions, saveQuestions } from 'src/services/quizapi.service';
@@ -40,6 +41,17 @@ export class QuestsController extends CommonService {
 		return this.questsService.createQuest(userId, questName, xp, category);
 	}
 
+	@Patch(':userId/:questId/complete')
+	async completeQuest(
+		@Param('userId') userId: string,
+		@Param('questId') questId: string
+	) {
+		const uid = Number(userId);
+		const qid = Number(questId);
+		console.log('CONTROLLER HIT', { uid, qid });
+		return this.questsService.completeQuest(uid, qid);
+	}
+
 	@Patch(':questId/assign-questions')
 	async assignQuestionsToQuest(
 		@Param('questId') questId: string,
@@ -53,14 +65,6 @@ export class QuestsController extends CommonService {
 		});
 
 		return updatedQuest;
-	}
-
-	@Patch(':userId/:questId/complete')
-	async completeQuest(
-		@Param('userId') userId: string,
-		@Param('questId') questId: string
-	) {
-		return this.questsService.completeQuest(Number(userId), Number(questId));
 	}
 
 	@Delete(':questId')
