@@ -1,66 +1,58 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
-  //output   = "./node_modules/@prisma/client"
 }
 
 datasource db {
   provider = "postgres"
-  url      = env("DATABASE_URL")
 }
 
 model User {
-  userId          Int          @id @default(autoincrement())
-  username        String       @unique
+  username        String            @unique
   password        String
-  level           Int          @default(1)
-  currentXP       Int          @default(0)
-  nextLevelXP     Int          @default(500)
-  completedQuests Int          @default(0)
-  streak          Int          @default(0)
+  userId          Int               @id @default(autoincrement())
+  completedQuests Int               @default(0)
+  currentXP       Int               @default(0)
+  level           Int               @default(1)
+  nextLevelXP     Int               @default(500)
+  streak          Int               @default(0)
   achievements    UserAchievement[]
   userQuests      UserQuest[]
+  coderTypeId     BigInt?
+  coderType       UserType? @relation(name: "UserCoderType", fields: [coderTypeId], references: [id])
 }
 
 model Quest {
-  questId     Int          @id @default(autoincrement())
+  questId     Int         @id @default(autoincrement())
+  xp          Int
+  isActive    Boolean     @default(true)
   questName   String
   description String?
-  xp          Int
-  category    String       @default("Calculus")
-  questionIds  Int[]       @default([]) 
-  difficulty  String       @default("Intermediate")
-  isActive    Boolean      @default(true)
+  category    String      @default("Calculus")
+  difficulty  String      @default("Intermediate")
+  questionIds Int[]       @default([])
   userQuests  UserQuest[]
-
 }
 
 model UserQuest {
-  id          Int      @id @default(autoincrement())
+  id          Int       @id @default(autoincrement())
   userId      Int
   questId     Int
-  completed   Boolean  @default(false)
+  completed   Boolean   @default(false)
   completedAt DateTime?
-  
-  user  User  @relation(fields: [userId], references: [userId])
-  quest Quest @relation(fields: [questId], references: [questId])
+  quest       Quest     @relation(fields: [questId], references: [questId])
+  user        User      @relation(fields: [userId], references: [userId])
 
   @@unique([userId, questId], name: "userId_questId")
 }
 
 model QuizQuestion {
   id           Int      @id @default(autoincrement())
-  externalId   String?  @unique 
-  source       String   
+  externalId   String?  @unique
+  source       String
   category     String
   difficulty   String?
-  question     String   @db.Text
-  answersJson  String  
+  question     String
+  answersJson  String
   correctIndex Int?
   xp           Int      @default(50)
   createdAt    DateTime @default(now())
@@ -68,29 +60,38 @@ model QuizQuestion {
 }
 
 model Achievement {
-  id          Int      @id @default(autoincrement())
-  name        String
-  description String
-  icon        String   // emoji or icon name
-  xpRequired  Int?     // for XP-based achievements
-  questsRequired Int?  // for quest-based achievements
-  category    String   // "xp", "quests", "streak", etc.
-  rarity      String   @default("common") // common, rare, epic, legendary
-  createdAt   DateTime @default(now())
-  
+  id               Int               @id @default(autoincrement())
+  name             String
+  description      String
+  icon             String
+  xpRequired       Int?
+  questsRequired   Int?
+  category         String
+  rarity           String            @default("common")
+  createdAt        DateTime          @default(now())
   userAchievements UserAchievement[]
 }
 
 model UserAchievement {
-  id            Int      @id @default(autoincrement())
+  id            Int         @id @default(autoincrement())
   userId        Int
   achievementId Int
-  unlockedAt    DateTime @default(now())
-  
-  user          User         @relation(fields: [userId], references: [userId], onDelete: Cascade)
-  achievement   Achievement  @relation(fields: [achievementId], references: [id], onDelete: Cascade)
-  
+  unlockedAt    DateTime    @default(now())
+  achievement   Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+  user          User        @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
   @@unique([userId, achievementId])
   @@index([userId])
 }
 
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model UserType {
+  id          BigInt   @id @default(autoincrement())
+  name        String   @default("")
+  min_xp      Decimal? @db.Decimal
+  max_xp      Decimal? @db.Decimal
+  min_quizzes Decimal? @db.Decimal
+  description String?
+
+  users       User[]   @relation("UserCoderType")
+}
