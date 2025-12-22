@@ -14,8 +14,10 @@ export class AchievementsService extends CommonService {
 
 		if (!user) return [];
 
-		const completedQuestsCount = user.userQuests.length;
-		const totalXP = user.currentXP || 0;
+		const completedQuestsCount = await this.prisma.userQuest.count({
+			where: { userId, completed: true }
+		});
+		const totalXP = user.currentXP ?? 0;
 		const unlockedAchievementIds = user.achievements.map(
 			(a) => a.achievementId
 		);
@@ -26,16 +28,20 @@ export class AchievementsService extends CommonService {
 			}
 		});
 
-		const newlyUnlocked: any[] = [];
+		const newlyUnlocked = [];
 
 		for (const achievement of availableAchievements) {
 			let shouldUnlock = false;
 
-			if (achievement.category === 'xp' && achievement.xpRequired) {
+			if (achievement.category === 'xp' 
+				&& achievement.xpRequired !==null
+			) {
 				shouldUnlock = totalXP >= achievement.xpRequired;
 			}
 
-			if (achievement.category === 'quests' && achievement.questsRequired) {
+			if (achievement.category === 'quests' 
+				&& achievement.questsRequired !==null
+			) {
 				shouldUnlock = completedQuestsCount >= achievement.questsRequired;
 			}
 
@@ -57,7 +63,11 @@ export class AchievementsService extends CommonService {
 		return this.prisma.userAchievement.findMany({
 			where: { userId },
 			include: { achievement: true },
-			orderBy: { unlockedAt: 'desc' }
+			orderBy: {
+				achievement: {
+					category: 'asc'
+			}
+}
 		});
 	}
 
