@@ -9,21 +9,25 @@ import {
 	ParseIntPipe
 } from '@nestjs/common';
 import { QuestsService } from './quests.service';
-import { getQuestions, saveQuestions } from 'src/services/quizapi.service';
+import { QuizApiService } from 'src/services/quizapi.service';
+
 import { CommonService } from 'src/common/services/common.service';
 
 @Controller('quests')
 export class QuestsController extends CommonService {
-	constructor(private readonly questsService: QuestsService) {
+	constructor(
+		private readonly questsService: QuestsService,
+		private readonly quizApiService: QuizApiService
+	) {
 		super();
 	}
 
 	@Post('seed-questions')
 	async seedQuestions(@Body() body: { category: string }) {
 		console.log('questionn:', body.category);
-		const questions = await getQuestions(body.category, 10);
+		const questions = await this.quizApiService.getQuestions(body.category, 10);
 		console.log('Fetched questions:', questions);
-		const saved = await saveQuestions(questions);
+		const saved = await this.quizApiService.saveQuestions(questions);
 		return saved;
 	}
 

@@ -9,6 +9,7 @@ import { AchievementsModule } from './achievements/achievements.module';
 import { LocalStorageModule } from './config/local-storage-module';
 import { APP_GUARD } from '@nestjs/core/constants';
 import { AuthenticatedGuard } from './auth/guards/authenticated.guard';
+import { UserTypeModule } from './userType/userType.module';
 
 @Module({
 	imports: [
@@ -17,7 +18,8 @@ import { AuthenticatedGuard } from './auth/guards/authenticated.guard';
 		UsersModule,
 		AuthModule,
 		QuestsModule,
-		AchievementsModule
+		AchievementsModule,
+		UserTypeModule
 	],
 	controllers: [BootstrapController],
 	providers: [

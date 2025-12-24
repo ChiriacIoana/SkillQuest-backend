@@ -5,7 +5,9 @@ import { INestApplication } from '@nestjs/common/interfaces/nest-application.int
 import envConfig from 'env.config';
 
 async function bootstrap() {
-	const app = await NestFactory.create(AppModule);
+	const app = await NestFactory.create(AppModule, {
+    logger: ['error', 'warn', 'log', 'debug', 'verbose'],
+  });
 
 	initValidationPipe(app);
 	app.enableCors();
