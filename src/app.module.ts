@@ -10,6 +10,7 @@ import { LocalStorageModule } from './config/local-storage-module';
 import { APP_GUARD } from '@nestjs/core/constants';
 import { AuthenticatedGuard } from './auth/guards/authenticated.guard';
 import { UserTypeModule } from './userType/userType.module';
+import { HintModule} from './analyze/hint.module';
 
 @Module({
 	imports: [
@@ -19,7 +20,8 @@ import { UserTypeModule } from './userType/userType.module';
 		AuthModule,
 		QuestsModule,
 		AchievementsModule,
-		UserTypeModule
+		UserTypeModule,
+		HintModule
 	],
 	controllers: [BootstrapController],
 	providers: [

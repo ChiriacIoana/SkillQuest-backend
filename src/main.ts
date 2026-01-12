@@ -12,8 +12,10 @@ async function bootstrap() {
 	initValidationPipe(app);
 	app.enableCors();
 
-	await app.listen(envConfig.PORT);
-	console.log(`✅ Server running on http://localhost:${envConfig.PORT}`);
+  const port = envConfig.PORT;
+  await app.listen(port);
+
+  console.log(`✅ Server running on port ${port}`);
 }
 bootstrap();
 
