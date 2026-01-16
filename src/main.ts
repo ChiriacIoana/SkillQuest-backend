@@ -10,12 +10,19 @@ async function bootstrap() {
   });
 
 	initValidationPipe(app);
-	app.enableCors();
+	app.enableCors({
+		origin: 'http://localhost:3000',
+		credential: true,
+		methods:['GET','POST','PUT','DELETE','PATCH','OPTIONS'],
+		allowedHeaders:['Content-Type','Authorization']
+	});
 
   const port = envConfig.PORT;
   await app.listen(port);
+  //onsole.log('DATABASE_URL:', envConfig.DATABASE_URL);
 
-  console.log(`✅ Server running on port ${port}`);
+
+  console.log(`Server running on port ${port}`);
 }
 bootstrap();
 

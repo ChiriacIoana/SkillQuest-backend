@@ -4,32 +4,26 @@ import { CommonService } from 'src/common/services/common.service';
 
 interface HintrequestDto {
     questionText: string;
-    correctAnswer: string;
-    userAnswer?: string;
 }
 
 @Controller('hint')
-export class HintController extends CommonService{
+export class HintController{
     constructor(private hintService: HintService) {
-        super();
     }
 
     @Post()
     async generateHint(@Body() body: HintrequestDto) {
-        const { questionText, correctAnswer, userAnswer } = body;
 
-        if(!questionText || !correctAnswer) {
+        const { questionText} = body;
+
+        if(!questionText) {
             throw new HttpException(
-                'questionText and correctAnswer are required', 
+                'questionText is required', 
                 HttpStatus.BAD_REQUEST
             );
         }
 
-        const hint = await this.hintService.generateHint(
-            questionText,
-            correctAnswer,
-            userAnswer
-        );
+        const hint = await this.hintService.generateHint(questionText);
 
         return { hint };
     }

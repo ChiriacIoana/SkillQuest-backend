@@ -11,9 +11,14 @@ import { APP_GUARD } from '@nestjs/core/constants';
 import { AuthenticatedGuard } from './auth/guards/authenticated.guard';
 import { UserTypeModule } from './userType/userType.module';
 import { HintModule} from './analyze/hint.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
 	imports: [
+		ConfigModule.forRoot({ 
+			isGlobal: true,
+		envFilePath: 'envConfig',
+		}),
 		LocalStorageModule,
 		PrismaModule,
 		UsersModule,

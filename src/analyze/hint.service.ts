@@ -1,17 +1,19 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import { env } from 'prisma/config';
+import configuration from '../../env.config';
 
 @Injectable()
 export class HintService {
   async generateHint(
-    questionText: string,
-    correctAnswer: string,
-    userAnswer?: string
+    questionText: string
   ): Promise<string> {
     try {
+
+      //console.log("HACKAI_API_KEY:", configuration.HACKAI_API_KEY);
       const response = await fetch("https://ai.hackclub.com/proxy/v1/responses", {
         method: "POST",
         headers: {
-          "Authorization": `Bearer ${process.env.AI_API_KEY}`,
+          "Authorization": `Bearer ${configuration.HACKAI_API_KEY}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
@@ -28,9 +30,6 @@ You are a helpful educational tutor providing hints for quiz questions.
 
 Question: ${questionText}
 
-Correct Answer: ${correctAnswer}
-${userAnswer ? `student's Current Answer: ${userAnswer}` : ''}
-
 STRICT RULES:
 - Do NOT reveal the actual answer directly
 - Do NOT give away key terms that are in the correct answer
@@ -46,7 +45,7 @@ Provide ONLY the hint text, nothing else.
               ],
             },
           ],
-          max_output_tokens: 150,
+          max_output_tokens: 350,
         }),
       });
 
@@ -55,7 +54,11 @@ Provide ONLY the hint text, nothing else.
       }
 
       const data = await response.json();
-      return this.extractAIText(data);
+      //console.log('AI API RESPONSE:', data); 
+
+      const hintText = this.extractAIText(data);
+      //console.log('EXTRACTED HINT:', hintText); 
+      return hintText;
     } catch (err) {
       console.error("Error generating hint:", err);
       throw new HttpException(
