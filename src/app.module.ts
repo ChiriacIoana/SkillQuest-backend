@@ -12,6 +12,7 @@ import { AuthenticatedGuard } from './auth/guards/authenticated.guard';
 import { UserTypeModule } from './userType/userType.module';
 import { HintModule} from './analyze/hint.module';
 import { ConfigModule } from '@nestjs/config';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
 	imports: [
@@ -26,7 +27,8 @@ import { ConfigModule } from '@nestjs/config';
 		QuestsModule,
 		AchievementsModule,
 		UserTypeModule,
-		HintModule
+		HintModule,
+		ChatModule
 	],
 	controllers: [BootstrapController],
 	providers: [
