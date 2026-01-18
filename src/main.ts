@@ -10,7 +10,7 @@ async function bootstrap() {
 	initValidationPipe(app);
 	app.enableCors({
 		origin: [
-			'skill-quest-omega.vercel.app',
+			'https://skill-quest-omega.vercel.app',
 			'http://localhost:3000',
 		],
 		
