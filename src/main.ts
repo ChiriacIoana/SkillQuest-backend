@@ -5,13 +5,15 @@ import { INestApplication } from '@nestjs/common/interfaces/nest-application.int
 import envConfig from 'env.config';
 
 async function bootstrap() {
-	const app = await NestFactory.create(AppModule, {
-    logger: ['error', 'warn', 'log', 'debug', 'verbose'],
-  });
+	const app = await NestFactory.create(AppModule);
 
 	initValidationPipe(app);
 	app.enableCors({
-		origin: 'http://localhost:3000',
+		origin: [
+			'skill-quest-omega.vercel.app',
+			'http://localhost:3000',
+		],
+		
 		credential: true,
 		methods:['GET','POST','PUT','DELETE','PATCH','OPTIONS'],
 		allowedHeaders:['Content-Type','Authorization']
