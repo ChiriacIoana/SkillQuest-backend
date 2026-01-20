@@ -14,41 +14,36 @@ interface HackAIResponse {
 @Injectable()
 export class ChatService {
 	private extractAIText(data: any): string {
-  if (!data?.output) return 'Unable to generate response at this time.';
+		return data.choices[0].message.content;
+//   if (!data?.output) return 'Unable to generate response at this time.';
 
-  const texts: string[] = [];
+//   const texts: string[] = [];
 
-  for (const msg of data.output) {
-    if (!msg.content) continue;
+//   for (const msg of data.output) {
+//     if (!msg.content) continue;
 
-    for (const c of msg.content) {
-      if (c.type === 'output_text' && c.text) {
-        texts.push(c.text.trim());
-      }
-    }
-  }
+//     for (const c of msg.content) {
+//       if (c.type === 'output_text' && c.text) {
+//         texts.push(c.text.trim());
+//       }
+//     }
+//   }
 
-  return texts.join('\n') || 'Unable to generate response at this time.';
+//   return texts.join('\n') || 'Unable to generate response at this time.';
 }
 
 	async sendMessage(message: string, conversationId?: string) {
 		try {
-			const res = await fetch('https://ai.hackclub.com/proxy/v1/responses', {
-				method: 'POST',
-				headers: {
-					Authorization: `Bearer ${configuration.HACKAI_API_KEY}`,
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({
-					model: 'openai/gpt-4o-mini',
-					input: [
-						{
-							type: 'message',
-							role: 'user',
-							content: [
-								{
-									type: 'input_text',
-									text: `
+			const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Authorization": "Bearer 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",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "google/gemini-3-flash-preview",
+           messages: [
+      { role: 'system', content: `
 You are a helpful AI tutor chatting with a student.
 
 IMPORTANT RULES:
@@ -62,16 +57,10 @@ IMPORTANT RULES:
 - Give your answer in 2-3 sentences MAXIMUM.
 
 User question:
-${message}
-`
-								}
-							]
-						}
-					],
-					conversation_id: conversationId,
-					max_output_tokens: 350
-				})
-			});
+${message}` },
+    ],
+            }),
+      });
 
 			if (!res.ok) throw new Error(`AI API error: ${res.status}`);
 

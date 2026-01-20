@@ -10,22 +10,16 @@ export class HintService {
     try {
 
       //console.log("HACKAI_API_KEY:", configuration.HACKAI_API_KEY);
-      const response = await fetch("https://ai.hackclub.com/proxy/v1/responses", {
+      const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
         method: "POST",
         headers: {
-          "Authorization": `Bearer ${configuration.HACKAI_API_KEY}`,
+          "Authorization": "Bearer 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",
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "openai/gpt-5.1",
-          input: [
-            {
-              type: "message",
-              role: "user",
-              content: [
-                {
-                  type: "input_text",
-                  text: `
+          model: "google/gemini-3-flash-preview",
+           messages: [
+      { role: 'system', content: `
 You are a helpful educational tutor providing hints for quiz questions.
 
 Question: ${questionText}
@@ -40,13 +34,9 @@ STRICT RULES:
 - FINISH a sentence if you start one. Do NOT leave it hanging. PLEASE.
 
 Provide ONLY the hint text, nothing else.
-`,
-                },
-              ],
-            },
-          ],
-          max_output_tokens: 350,
-        }),
+` },
+    ],
+            }),
       });
 
       if (!response.ok) {
@@ -69,20 +59,23 @@ Provide ONLY the hint text, nothing else.
   }
 
   private extractAIText(data: any): string {
-    if (!data?.output) return "Unable to generate hint at this time.";
+    return data.choices[0].message.content;
+    // if (!text) return "Unable to generate hint at this time.";
+
+
     
-    const texts: string[] = [];
+    // const texts: string[] = [];
     
-    for (const msg of data.output) {
-      if (!msg.content) continue;
+    // for (const msg of data.choices[0]) {
+    //   if (!msg.content) continue;
       
-      for (const c of msg.content) {
-        if (c.type === "output_text" && c.text) {
-          texts.push(c.text.trim());
-        }
-      }
-    }
+    //   for (const c of msg.content) {
+    //     if (c.type === "output_text" && c.text) {
+    //       texts.push(c.text.trim());
+    //     }
+    //   }
+    // }
     
-    return texts.join("\n") || "Unable to generate hint at this time.";
+    // return texts.join("\n") || "Unable to generate hint at this time.";
   }
 }
